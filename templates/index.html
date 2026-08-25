@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="VOYAGE — مرحلة اكتشاف متطلبات المشروع قبل بناء PRD">
+  <title>{{ project.name }} — اكتشاف متطلبات المشروع</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="client-page">
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="brand">
+        <img src="{{ url_for('static', filename='img/voyage-logo.png') }}" alt="VOYAGE" class="brand-logo">
+        <div>
+          <strong>{{ project.name_ar }}</strong>
+          <span>Project Discovery</span>
+        </div>
+      </div>
+      <div class="secure-note">مرحلة دراسة المتطلبات</div>
+    </div>
+  </header>
+
+  <main class="shell page-grid">
+    <aside class="intro-card">
+      <div class="eyebrow">قبل ما نبدأ التطوير</div>
+      <h1>خلّنا نفهم المشروع من إلى</h1>
+      <p>هذه المرحلة تساعدنا نفهم طريقة عمل المكتب اليوم، المشاكل الفعلية، الخدمات المطلوبة، والأشياء اللي تستحق الأتمتة قبل كتابة الـ PRD وتحديد النطاق.</p>
+
+      <div class="info-box">
+        <strong>وش يصير بعد الإرسال؟</strong>
+        <ol>
+          <li>نراجع إجاباتك ونحلل المتطلبات.</li>
+          <li>نحدد النقاط اللي تحتاج نقاش.</li>
+          <li>نعقد جلسة Discovery مركزة.</li>
+          <li>نبني PRD مبدئي ونراجعه معك.</li>
+        </ol>
+      </div>
+
+      <div class="privacy-box">
+        <strong>تنبيه مهم</strong>
+        <p>لا تضع كلمات مرور، مفاتيح API، بيانات بطاقات أو أي أسرار دخول. نحتاج أسماء الأنظمة وطريقة العمل فقط.</p>
+      </div>
+    </aside>
+
+    <section class="form-card">
+      <div class="form-head">
+        <div>
+          <span id="stepCounter" class="step-counter"></span>
+          <h2 id="stepTitle">دراسة المشروع</h2>
+        </div>
+        <span id="saveState" class="save-state">يتم حفظ تقدمك تلقائياً</span>
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <form id="discoveryForm" novalidate>
+        <input type="text" name="website" id="website" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+        {% for section in sections %}
+        <fieldset class="form-step" data-step="{{ loop.index0 }}" data-title="{{ section.title }}" {% if not loop.first %}hidden{% endif %}>
+          <legend>
+            <span>{{ section.title }}</span>
+            <small>{{ section.description }}</small>
+          </legend>
+
+          {% for q in section.questions %}
+          <div class="field" data-question data-type="{{ q.type }}" data-id="{{ q.id }}" data-label="{{ q.label }}" data-required="{{ '1' if q.required else '0' }}">
+            <label class="field-label" {% if q.type not in ['radio', 'checkboxes', 'checkbox'] %}for="{{ q.id }}"{% endif %}>
+              {{ q.label }}
+              {% if q.required %}<span class="required">*</span>{% endif %}
+            </label>
+
+            {% if q.type == 'textarea' %}
+              <textarea id="{{ q.id }}" name="{{ q.id }}" rows="5" placeholder="{{ q.placeholder|default('') }}"></textarea>
+            {% elif q.type in ['text', 'email'] %}
+              <input id="{{ q.id }}" name="{{ q.id }}" type="{{ q.type }}" placeholder="{{ q.placeholder|default('') }}">
+            {% elif q.type == 'select' %}
+              <select id="{{ q.id }}" name="{{ q.id }}">
+                <option value="">اختر...</option>
+                {% for option in q.options %}<option value="{{ option }}">{{ option }}</option>{% endfor %}
+              </select>
+            {% elif q.type == 'radio' %}
+              <div class="choice-grid">
+                {% for option in q.options %}
+                <label class="choice"><input type="radio" name="{{ q.id }}" value="{{ option }}"><span>{{ option }}</span></label>
+                {% endfor %}
+              </div>
+            {% elif q.type == 'checkboxes' %}
+              <div class="choice-grid">
+                {% for option in q.options %}
+                <label class="choice"><input type="checkbox" name="{{ q.id }}" value="{{ option }}"><span>{{ option }}</span></label>
+                {% endfor %}
+              </div>
+            {% elif q.type == 'checkbox' %}
+              <label class="consent"><input type="checkbox" id="{{ q.id }}" name="{{ q.id }}"><span>{{ q.label }}</span></label>
+            {% endif %}
+
+            <div class="field-error" role="alert"></div>
+          </div>
+          {% endfor %}
+        </fieldset>
+        {% endfor %}
+
+        <fieldset class="form-step review-step" data-step="{{ sections|length }}" data-title="مراجعة الإجابات" hidden>
+          <legend>
+            <span>مراجعة الإجابات</span>
+            <small>راجع المعلومات قبل الإرسال. تقدر ترجع لأي خطوة وتعدل.</small>
+          </legend>
+          <div id="reviewContent" class="review-content"></div>
+          <div class="submit-note">بإرسال النموذج، يتم استخدام هذه المعلومات لدراسة المشروع وبناء PRD مبدئي فقط.</div>
+        </fieldset>
+
+        <div id="formErrors" class="form-errors" hidden></div>
+
+        <div class="form-actions">
+          <button type="button" id="prevBtn" class="btn btn-secondary" hidden>السابق</button>
+          <div class="actions-spacer"></div>
+          <button type="button" id="nextBtn" class="btn btn-primary">التالي</button>
+          <button type="submit" id="submitBtn" class="btn btn-primary" hidden>إرسال المتطلبات</button>
+        </div>
+      </form>
+
+      <div id="successPanel" class="success-panel" hidden>
+        <div class="success-icon">✓</div>
+        <h2>تم استلام تصور المشروع</h2>
+        <p>بنراجع الإجابات ونحوّلها لنقاط ومتطلبات واضحة قبل جلسة الـ Discovery.</p>
+        <div class="reference-card">رقم المرجع: <strong id="referenceId"></strong></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell footer">VOYAGE Project Discovery • هذه المرحلة ليست عقد تنفيذ أو عرض سعر نهائي.</footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</body>
+</html>

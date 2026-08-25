@@ -103,7 +103,20 @@ input:focus, textarea:focus, select:focus { border-color: #7c9bc8; box-shadow: 0
 .has-error .choice-grid { outline: 2px solid rgba(180, 35, 24, .12); border-radius: 13px; }
 .honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; opacity: 0 !important; }
 
-.form-actions { display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--line); margin-top: 8px; padding-top: 22px; }
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  margin: 16px -28px -28px;
+  padding: 16px 28px;
+  position: sticky;
+  bottom: 0;
+  z-index: 8;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 -8px 24px rgba(23,32,51,.05);
+}
 .actions-spacer { flex: 1; }
 .btn { border: 0; border-radius: 12px; min-height: 44px; padding: 10px 18px; font-weight: 700; }
 .btn-primary { color: #fff; background: linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow: 0 9px 22px rgba(26,47,87,.18); }
@@ -112,13 +125,15 @@ input:focus, textarea:focus, select:focus { border-color: #7c9bc8; box-shadow: 0
 .btn-secondary { color: var(--primary); background: #eef3fa; border: 1px solid #dce5f1; }
 .form-errors { margin: 18px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--danger-bg); color: var(--danger); border: 1px solid #f4c7c3; font-size: 13px; }
 
-.review-group { border: 1px solid var(--line); border-radius: 15px; margin-bottom: 16px; overflow: hidden; }
-.review-group h3 { margin: 0; padding: 13px 16px; background: #f7f9fc; color: var(--primary); font-size: 15px; border-bottom: 1px solid var(--line); }
-.review-item { padding: 12px 16px; border-bottom: 1px solid #edf0f4; }
-.review-item:last-child { border-bottom: 0; }
+.review-content { display: grid; gap: 12px; margin-bottom: 16px; }
+.review-summary { padding: 16px; border: 1px solid #d9e4f3; background: #f6f9fe; border-radius: 14px; }
+.review-summary strong { display: block; color: var(--primary); font-size: 15px; }
+.review-summary span { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
+.review-item { padding: 12px 16px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
 .review-item strong { display: block; font-size: 12px; color: var(--muted); }
 .review-item p { margin: 4px 0 0; white-space: pre-wrap; font-size: 14px; }
-.submit-note { padding: 13px; border: 1px solid #e9dfc8; background: #fffaf2; color: #75603d; border-radius: 12px; font-size: 12px; }
+.review-item-compact p { max-height: 96px; overflow: auto; }
+.submit-note { padding: 13px; border: 1px solid #e9dfc8; background: #fffaf2; color: #75603d; border-radius: 12px; font-size: 12px; margin-bottom: 10px; }
 .success-panel { padding: 70px 28px; text-align: center; }
 .success-icon { width: 64px; height: 64px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center; background: #e9f9f1; color: var(--success); font-size: 32px; font-weight: 900; }
 .success-panel h2 { margin: 0 0 8px; }
@@ -179,6 +194,7 @@ input:focus, textarea:focus, select:focus { border-color: #7c9bc8; box-shadow: 0
   form { padding: 20px 18px; }
   .form-step legend > span { font-size: 21px; }
   .choice-grid { grid-template-columns: 1fr; }
+  .form-actions { margin: 16px -18px -20px; padding: 14px 18px; }
   .form-actions .btn { flex: 1; }
   .actions-spacer { display: none; }
   .meta-grid { grid-template-columns: 1fr; }

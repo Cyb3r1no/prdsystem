@@ -12,6 +12,7 @@ jobs:
     env:
       SECRET_KEY: test-secret-key
       ADMIN_TOKEN: test-admin-token
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

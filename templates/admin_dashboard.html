@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>الردود — {{ project.name }}</title>
+  <title>Discovery Inbox — {{ project.name }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/discovery-v3.css') }}">
 </head>
 <body class="admin-body">
   <header class="topbar">
     <div class="shell topbar-inner">
       <div class="brand">
-        <img src="{{ url_for('static', filename='img/voyage-logo.png') }}" alt="VOYAGE" class="brand-logo">
+        <img src="{{ url_for('static', filename='img/voyage-logo.png') }}" alt="{{ project.name }}" class="brand-logo">
         <div><strong>{{ project.name_ar }}</strong><span>Discovery Admin</span></div>
       </div>
       <form method="post" action="{{ url_for('admin_logout') }}"><button class="btn btn-secondary" type="submit">تسجيل خروج</button></form>
@@ -20,31 +21,42 @@
   <main class="shell admin-main">
     <section class="admin-card">
       <div class="admin-header">
-        <div><h1>ردود Discovery</h1><p>كل إرسال من العميل يظهر هنا مع إمكانية التصدير للتحليل وبناء PRD.</p></div>
-        <a class="btn btn-secondary" href="{{ url_for('index') }}" target="_blank" rel="noopener">فتح نموذج العميل</a>
+        <div>
+          <div class="eyebrow">Team Workspace</div>
+          <h1>Discovery Inbox</h1>
+          <p>راجع المشكلة والفجوات أولاً، وبعدها ابنِ الـ PRD والحل مع الفريق.</p>
+        </div>
+        <a class="btn btn-secondary" href="{{ url_for('index') }}" target="_blank" rel="noopener">فتح رابط العميل</a>
       </div>
 
-      {% if submissions %}
+      {% if items %}
       <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>المرجع</th><th>المسؤول</th><th>البريد</th><th>الجوال</th><th>الحالة</th><th>التاريخ</th><th></th></tr></thead>
+        <table class="admin-table discovery-table">
+          <thead><tr><th>المرجع</th><th>الجهة / المسؤول</th><th>الجاهزية</th><th>الحالة</th><th>التاريخ</th><th></th></tr></thead>
           <tbody>
-            {% for item in submissions %}
+            {% for item in items %}
             <tr>
-              <td><a class="link" href="{{ url_for('admin_submission', submission_id=item.id) }}">{{ item.id }}</a></td>
-              <td>{{ item.contact_name or '-' }}</td>
-              <td>{{ item.contact_email or '-' }}</td>
-              <td>{{ item.contact_phone or '-' }}</td>
-              <td><span class="status">{{ item.status }}</span></td>
-              <td>{{ item.created_at }}</td>
-              <td><a class="link" href="{{ url_for('admin_submission', submission_id=item.id) }}">عرض</a></td>
+              <td><a class="link" href="{{ url_for('admin_submission', submission_id=item.row.id) }}">{{ item.row.id }}</a></td>
+              <td>
+                <strong class="table-primary">{{ item.company_name }}</strong>
+                <span class="table-secondary">{{ item.row.contact_name or '-' }}</span>
+              </td>
+              <td>
+                <div class="readiness-inline">
+                  <strong>{{ item.analysis.score }}%</strong>
+                  <span class="mini-progress"><i style="width: {{ item.analysis.score }}%"></i></span>
+                </div>
+              </td>
+              <td><span class="status status-{{ item.row.status }}">{{ status_labels.get(item.row.status, item.row.status) }}</span></td>
+              <td>{{ item.row.created_at[:10] }}</td>
+              <td><a class="link" href="{{ url_for('admin_submission', submission_id=item.row.id) }}">تحليل</a></td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
       {% else %}
-      <div class="empty-state">ما وصل أي رد حتى الآن.</div>
+      <div class="empty-state">ما وصل أي Discovery حتى الآن.</div>
       {% endif %}
     </section>
   </main>

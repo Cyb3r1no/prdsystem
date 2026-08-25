@@ -16,7 +16,7 @@
   const successPanel = document.getElementById('successPanel');
   const formCard = form.closest('.form-card');
 
-  const storageKey = 'prdsystem:voyage:client-brief:v2';
+  const storageKey = 'prdsystem:discovery:v3';
   let currentStep = 0;
   let saveTimer;
 
@@ -107,7 +107,9 @@
           }
         });
       }
-      if (Number.isInteger(draft.step)) currentStep = Math.max(0, Math.min(draft.step, steps.length - 2));
+      if (Number.isInteger(draft.step)) {
+        currentStep = Math.max(0, Math.min(draft.step, steps.length - 2));
+      }
     } catch (_) {
       localStorage.removeItem(storageKey);
     }
@@ -134,7 +136,7 @@
       if (block.dataset.required !== '1') return;
       const value = questionValue(block);
       if (isEmpty(value)) {
-        setError(block, 'هذا السؤال مهم عشان نقدر نفهم المشروع قبل الانتقال.');
+        setError(block, 'هذي النقطة مهمة عشان نفهم المشروع قبل نكمل.');
         valid = false;
       }
     });
@@ -158,10 +160,10 @@
     const answeredCount = Object.values(answers).filter(value => !isEmpty(value)).length;
     const summary = document.createElement('div');
     summary.className = 'review-summary';
-    summary.innerHTML = `<strong>ممتاز، وصلنا أساس الفكرة.</strong><span>جاوبت على ${answeredCount} نقاط. تحت ملخص لأهم المعلومات فقط.</span>`;
+    summary.innerHTML = `<strong>الصورة الأساسية صارت واضحة.</strong><span>جاوبت على ${answeredCount} نقطة. راجع أهم أربع نقاط قبل الإرسال.</span>`;
     reviewContent.appendChild(summary);
 
-    const coreIds = ['project_vision', 'core_problem', 'current_process', 'must_haves'];
+    const coreIds = ['core_problem', 'current_process', 'desired_outcome', 'must_haves'];
     coreIds.forEach(id => {
       const block = questionBlocks.find(item => item.dataset.id === id);
       if (!block) return;
@@ -187,7 +189,7 @@
     const percentage = ((currentStep + 1) / steps.length) * 100;
     progressBar.style.width = `${percentage}%`;
     stepCounter.textContent = isReview ? 'الخطوة الأخيرة' : `الخطوة ${currentStep + 1} من ${steps.length - 1}`;
-    stepTitle.textContent = steps[currentStep].dataset.title || 'Client Brief';
+    stepTitle.textContent = steps[currentStep].dataset.title || 'Discovery Brief';
     prevBtn.hidden = currentStep === 0;
     nextBtn.hidden = isReview;
     submitBtn.hidden = !isReview;
@@ -204,7 +206,7 @@
 
   prevBtn.addEventListener('click', () => showStep(currentStep - 1));
 
-  form.addEventListener('input', (event) => {
+  form.addEventListener('input', event => {
     const block = event.target.closest('[data-question]');
     if (block) clearError(block);
     clearTimeout(saveTimer);
@@ -213,7 +215,7 @@
 
   form.addEventListener('change', saveDraft);
 
-  form.addEventListener('submit', async (event) => {
+  form.addEventListener('submit', async event => {
     event.preventDefault();
     formErrors.hidden = true;
     formErrors.textContent = '';
@@ -223,7 +225,7 @@
       answers,
       website: document.getElementById('website').value,
       meta: {
-        formVersion: 'voyage-client-brief-v2',
+        formVersion: 'discovery-v3',
         language: 'ar',
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
       },
@@ -258,7 +260,7 @@
       formErrors.hidden = false;
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'إرسال التصور';
+      submitBtn.textContent = 'إرسال Discovery';
     }
   });
 

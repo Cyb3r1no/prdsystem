@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 150" role="img" aria-labelledby="title desc">
+  <title id="title">VOYAGE</title>
+  <desc id="desc">VOYAGE Travel and Tourism</desc>
+  <rect width="460" height="150" rx="18" fill="white"/>
+  <g fill="none" stroke="#1a2f57" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M58 86c21-31 47-49 79-57-7 13-9 25-6 36 9-5 20-6 31-3-19 7-35 19-47 36-10 15-18 30-23 46-8-22-19-41-34-58z"/>
+    <path d="M67 78c-16-8-28-18-37-30 23 4 42 12 57 24"/>
+    <path d="M105 40c7-16 17-27 30-34-1 16 1 29 7 38"/>
+  </g>
+  <text x="182" y="76" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700" letter-spacing="7" fill="#1a2f57">VOYAGE</text>
+  <text x="184" y="112" font-family="Arial, Tahoma, sans-serif" font-size="18" fill="#c69a52">TRAVEL &amp; TOURISM</text>
+</svg>

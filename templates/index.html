@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="VOYAGE — مرحلة اكتشاف متطلبات المشروع قبل بناء PRD">
-  <title>{{ project.name }} — اكتشاف متطلبات المشروع</title>
+  <meta name="description" content="VOYAGE — نموذج مختصر لفهم فكرة المشروع قبل جلسة Discovery وبناء PRD">
+  <title>{{ project.name }} — Client Brief</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body class="client-page">
@@ -17,29 +17,29 @@
           <span>Project Discovery</span>
         </div>
       </div>
-      <div class="secure-note">مرحلة دراسة المتطلبات</div>
+      <div class="secure-note">Client Brief • 5–8 دقائق</div>
     </div>
   </header>
 
   <main class="shell page-grid">
     <aside class="intro-card">
-      <div class="eyebrow">قبل ما نبدأ التطوير</div>
-      <h1>خلّنا نفهم المشروع من إلى</h1>
-      <p>هذه المرحلة تساعدنا نفهم طريقة عمل المكتب اليوم، المشاكل الفعلية، الخدمات المطلوبة، والأشياء اللي تستحق الأتمتة قبل كتابة الـ PRD وتحديد النطاق.</p>
+      <div class="eyebrow">المرحلة الأولى</div>
+      <h1>خلّنا نبدأ من فكرتك</h1>
+      <p>هذا مو PRD ولا عقد تنفيذ. نحتاج منك تصورك وطريقة العمل الحالية فقط، وإحنا نحولها بعدين إلى متطلبات واضحة ونناقشها معك.</p>
 
       <div class="info-box">
         <strong>وش يصير بعد الإرسال؟</strong>
         <ol>
-          <li>نراجع إجاباتك ونحلل المتطلبات.</li>
-          <li>نحدد النقاط اللي تحتاج نقاش.</li>
-          <li>نعقد جلسة Discovery مركزة.</li>
-          <li>نبني PRD مبدئي ونراجعه معك.</li>
+          <li>نحلل فكرتك ونستخرج المتطلبات الأولية.</li>
+          <li>نحدد الأسئلة والنقاط الناقصة الخاصة بمشروعك.</li>
+          <li>نعقد جلسة Discovery مركزة بدل استبيان طويل.</li>
+          <li>نبني PRD مبدئي ونراجعه معك قبل التنفيذ.</li>
         </ol>
       </div>
 
       <div class="privacy-box">
-        <strong>تنبيه مهم</strong>
-        <p>لا تضع كلمات مرور، مفاتيح API، بيانات بطاقات أو أي أسرار دخول. نحتاج أسماء الأنظمة وطريقة العمل فقط.</p>
+        <strong>ما تحتاج تعرف أي تفاصيل تقنية</strong>
+        <p>اكتب بطريقتك. لا تضع كلمات مرور، مفاتيح API أو بيانات حساسة؛ نحتاج الفكرة وطريقة العمل فقط.</p>
       </div>
     </aside>
 
@@ -47,7 +47,7 @@
       <div class="form-head">
         <div>
           <span id="stepCounter" class="step-counter"></span>
-          <h2 id="stepTitle">دراسة المشروع</h2>
+          <h2 id="stepTitle">Client Brief</h2>
         </div>
         <span id="saveState" class="save-state">يتم حفظ تقدمك تلقائياً</span>
       </div>
@@ -104,13 +104,13 @@
         </fieldset>
         {% endfor %}
 
-        <fieldset class="form-step review-step" data-step="{{ sections|length }}" data-title="مراجعة الإجابات" hidden>
+        <fieldset class="form-step review-step" data-step="{{ sections|length }}" data-title="جاهز للإرسال" hidden>
           <legend>
-            <span>مراجعة الإجابات</span>
-            <small>راجع المعلومات قبل الإرسال. تقدر ترجع لأي خطوة وتعدل.</small>
+            <span>جاهز نبدأ دراسة المشروع</span>
+            <small>راجع الملخص السريع تحت. إذا فيه شيء تبي تعدله ارجع للخطوة السابقة.</small>
           </legend>
           <div id="reviewContent" class="review-content"></div>
-          <div class="submit-note">بإرسال النموذج، يتم استخدام هذه المعلومات لدراسة المشروع وبناء PRD مبدئي فقط.</div>
+          <div class="submit-note">إرسال هذا النموذج يعني استلامنا لتصورك الأولي فقط، ولا يعتبر موافقة على نطاق أو سعر أو تنفيذ نهائي.</div>
         </fieldset>
 
         <div id="formErrors" class="form-errors" hidden></div>
@@ -119,20 +119,20 @@
           <button type="button" id="prevBtn" class="btn btn-secondary" hidden>السابق</button>
           <div class="actions-spacer"></div>
           <button type="button" id="nextBtn" class="btn btn-primary">التالي</button>
-          <button type="submit" id="submitBtn" class="btn btn-primary" hidden>إرسال المتطلبات</button>
+          <button type="submit" id="submitBtn" class="btn btn-primary" hidden>إرسال التصور</button>
         </div>
       </form>
 
       <div id="successPanel" class="success-panel" hidden>
         <div class="success-icon">✓</div>
-        <h2>تم استلام تصور المشروع</h2>
-        <p>بنراجع الإجابات ونحوّلها لنقاط ومتطلبات واضحة قبل جلسة الـ Discovery.</p>
+        <h2>وصلنا تصور المشروع</h2>
+        <p>الخطوة الجاية عندنا: تحليل الفكرة، استخراج المتطلبات الأولية وتجهيز نقاط جلسة الـ Discovery معك.</p>
         <div class="reference-card">رقم المرجع: <strong id="referenceId"></strong></div>
       </div>
     </section>
   </main>
 
-  <footer class="shell footer">VOYAGE Project Discovery • هذه المرحلة ليست عقد تنفيذ أو عرض سعر نهائي.</footer>
+  <footer class="shell footer">VOYAGE Project Discovery • Client Brief → Discovery Meeting → PRD Review → Approval</footer>
 
   <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 </body>

@@ -16,7 +16,7 @@
   const successPanel = document.getElementById('successPanel');
   const formCard = form.closest('.form-card');
 
-  const storageKey = 'prdsystem:voyage:draft:v1';
+  const storageKey = 'prdsystem:voyage:client-brief:v2';
   let currentStep = 0;
   let saveTimer;
 
@@ -134,15 +134,8 @@
       if (block.dataset.required !== '1') return;
       const value = questionValue(block);
       if (isEmpty(value)) {
-        setError(block, 'هذا السؤال مطلوب قبل الانتقال للخطوة التالية.');
+        setError(block, 'هذا السؤال مهم عشان نقدر نفهم المشروع قبل الانتقال.');
         valid = false;
-      }
-      if (block.dataset.type === 'email' && value) {
-        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-        if (!emailOk) {
-          setError(block, 'اكتب بريد إلكتروني صحيح.');
-          valid = false;
-        }
       }
     });
     if (!valid) {
@@ -152,35 +145,37 @@
     return valid;
   }
 
+  function displayValue(raw) {
+    if (Array.isArray(raw)) return raw.join('، ');
+    if (typeof raw === 'boolean') return raw ? 'نعم' : 'لا';
+    return String(raw || '');
+  }
+
   function renderReview() {
     const answers = collectAnswers();
-    const sectionEls = steps.slice(0, -1);
     reviewContent.innerHTML = '';
 
-    sectionEls.forEach(sectionEl => {
-      const blocks = [...sectionEl.querySelectorAll('[data-question]')];
-      const answered = blocks.filter(block => !isEmpty(answers[block.dataset.id]));
-      if (!answered.length) return;
+    const answeredCount = Object.values(answers).filter(value => !isEmpty(value)).length;
+    const summary = document.createElement('div');
+    summary.className = 'review-summary';
+    summary.innerHTML = `<strong>ممتاز، وصلنا أساس الفكرة.</strong><span>جاوبت على ${answeredCount} نقاط. تحت ملخص لأهم المعلومات فقط.</span>`;
+    reviewContent.appendChild(summary);
 
-      const group = document.createElement('section');
-      group.className = 'review-group';
-      const heading = document.createElement('h3');
-      heading.textContent = sectionEl.dataset.title;
-      group.appendChild(heading);
+    const coreIds = ['project_vision', 'core_problem', 'current_process', 'must_haves'];
+    coreIds.forEach(id => {
+      const block = questionBlocks.find(item => item.dataset.id === id);
+      if (!block) return;
+      const raw = answers[id];
+      if (isEmpty(raw)) return;
 
-      answered.forEach(block => {
-        const item = document.createElement('div');
-        item.className = 'review-item';
-        const label = document.createElement('strong');
-        label.textContent = block.dataset.label;
-        const value = document.createElement('p');
-        const raw = answers[block.dataset.id];
-        value.textContent = Array.isArray(raw) ? raw.join('، ') : (typeof raw === 'boolean' ? (raw ? 'نعم' : 'لا') : raw);
-        item.append(label, value);
-        group.appendChild(item);
-      });
-
-      reviewContent.appendChild(group);
+      const item = document.createElement('div');
+      item.className = 'review-item review-item-compact';
+      const label = document.createElement('strong');
+      label.textContent = block.dataset.label;
+      const value = document.createElement('p');
+      value.textContent = displayValue(raw);
+      item.append(label, value);
+      reviewContent.appendChild(item);
     });
   }
 
@@ -191,8 +186,8 @@
     const isReview = currentStep === steps.length - 1;
     const percentage = ((currentStep + 1) / steps.length) * 100;
     progressBar.style.width = `${percentage}%`;
-    stepCounter.textContent = isReview ? 'المراجعة النهائية' : `الخطوة ${currentStep + 1} من ${steps.length - 1}`;
-    stepTitle.textContent = steps[currentStep].dataset.title || 'دراسة المشروع';
+    stepCounter.textContent = isReview ? 'الخطوة الأخيرة' : `الخطوة ${currentStep + 1} من ${steps.length - 1}`;
+    stepTitle.textContent = steps[currentStep].dataset.title || 'Client Brief';
     prevBtn.hidden = currentStep === 0;
     nextBtn.hidden = isReview;
     submitBtn.hidden = !isReview;
@@ -228,7 +223,7 @@
       answers,
       website: document.getElementById('website').value,
       meta: {
-        formVersion: 'voyage-v1',
+        formVersion: 'voyage-client-brief-v2',
         language: 'ar',
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
       },
@@ -259,11 +254,11 @@
       successPanel.hidden = false;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (_) {
-      formErrors.textContent = 'تعذر الاتصال بالسيرفر. تأكد من الإنترنت وحاول مرة ثانية.';
+      formErrors.textContent = 'تعذر الاتصال بالسيرفر. حاول مرة ثانية.';
       formErrors.hidden = false;
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'إرسال المتطلبات';
+      submitBtn.textContent = 'إرسال التصور';
     }
   });
 

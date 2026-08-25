@@ -1,108 +1,134 @@
-# PRD System — VOYAGE Discovery Portal
+# PRD System — Client Discovery Portal
 
-بوابة ويب عربية لجمع متطلبات العميل قبل بناء الـ PRD.
+بوابة عربية لاكتشاف متطلبات العميل قبل بناء الـ PRD. الفكرة التشغيلية بسيطة ومقصودة:
 
-## الهدف
+- **رابط واحد** يرسل لأي عميل.
+- العميل يشرح الفكرة، المشكلة، طريقة العمل الحالية والنتيجة المطلوبة.
+- الرد يظهر في **لوحة Admin واحدة** للفريق.
+- النظام يحسب **Discovery Readiness** ويعرض أهم الفجوات والأسئلة التي يجب إقفالها.
+- الفريق يناقش العميل في النقاط الناقصة، ثم يبني الـ PRD ويقترح الحل.
 
-الرابط يُرسل للعميل قبل التنفيذ. العميل يشرح فكرته وطريقة عمله الحالية، يحدد الأولويات والتكاملات والأتمتة المطلوبة، ثم تحفظ الإجابات على السيرفر وتظهر في لوحة خاصة لصاحب المشروع. بعدها تُستخدم الإجابات لبناء PRD v0.1 ومناقشته مع العميل.
+> النظام لا يولد حلولاً تلقائياً ولا يعتبر كلام العميل Requirements معتمدة. دوره هو تحسين جودة الـ Discovery وتقليل الافتراضات قبل كتابة الـ PRD.
 
-## المزايا
+## Workflow
 
-- واجهة عربية RTL ومتجاوبة مع الجوال.
-- نموذج متعدد المراحل مع Progress Bar.
-- حفظ التقدم تلقائياً في المتصفح حتى لو أغلق العميل الصفحة.
-- صفحة مراجعة قبل الإرسال.
-- تخزين الردود محلياً في SQLite على السيرفر — لا تُرفع إجابات العملاء إلى GitHub.
-- لوحة إدارة محمية بـ `ADMIN_TOKEN`.
-- تصدير الرد كـ JSON أو Markdown جاهز للتحليل وبناء PRD.
-- Honeypot + حدود على حجم الطلب + تحقق Server-side للحد من السبام والمدخلات غير الصحيحة.
-- Docker Compose للنشر السريع.
+```text
+Single Client Link
+        ↓
+Client Discovery Brief
+        ↓
+Admin Discovery Inbox
+        ↓
+Readiness + Gaps + Executive Snapshot
+        ↓
+Focused Client Discussion
+        ↓
+Team Solution / MVP Decisions
+        ↓
+PRD v0.1
+        ↓
+Client Review
+        ↓
+PRD v1.0 / Scope / Cost / Timeline
+```
 
-## تشغيل سريع
+## تجربة العميل
+
+النموذج مقسم إلى 4 مراحل قصيرة:
+
+1. الفكرة والمشكلة.
+2. طريقة العمل الحالية ونقاط الألم.
+3. النتيجة المطلوبة وMust-have للنسخة الأولى.
+4. التكاملات والقيود والموعد وأصحاب القرار.
+
+الأسئلة المطلوبة محدودة حتى لا يتحول الـ Discovery إلى استبيان طويل، بينما الأسئلة الاختيارية تساعد العميل يعطي سياقاً أعمق إذا كان متاحاً.
+
+## لوحة الفريق
+
+كل Submission يعرض:
+
+- Discovery Readiness من 0–100%.
+- حالة وضوح المشكلة، الوضع الحالي، النتيجة ونطاق V1.
+- Executive Snapshot لأهم أربع نقاط.
+- أهم أسئلة يجب إقفالها قبل كتابة PRD.
+- جميع إجابات العميل الأصلية كـ Source of Truth.
+- تصدير JSON خام.
+- تصدير Markdown منظم كـ **Discovery Brief** جاهز لاستخدامه في جلسة الفريق أو كمدخل لصياغة PRD.
+
+## الخصوصية والأمان
+
+- الردود تحفظ في SQLite داخل السيرفر فقط.
+- مجلد `data/` غير مرفوع إلى GitHub.
+- Admin محمي بـ `ADMIN_TOKEN` وجلسة HttpOnly.
+- Security headers مفعلة، وصفحات Admin تستخدم `Cache-Control: no-store`.
+- المدخلات تتحقق Server-side ويتم تجاهل الحقول غير المعروفة قبل التخزين.
+- Honeypot لتقليل السبام.
+- حد أقصى لحجم الطلب 1 MB.
+
+**لا تطلب من العميل إدخال:** كلمات مرور، API keys، بيانات بطاقات، 2FA، أسرار أو بيانات حساسة غير لازمة للـ Discovery.
+
+## التشغيل
 
 ```bash
 git clone https://github.com/Cyb3r1no/prdsystem.git
 cd prdsystem
 cp .env.example .env
-# غيّر القيم داخل .env
+# عدل SECRET_KEY و ADMIN_TOKEN
 docker compose up -d --build
 ```
 
-ثم افتح:
+ثم:
 
-- نموذج العميل: `http://SERVER_IP:8080/`
-- لوحة الإدارة: `http://SERVER_IP:8080/admin/login`
-- فحص الخدمة: `http://SERVER_IP:8080/health`
+- رابط العميل: `http://SERVER_IP:8080/`
+- Admin: `http://SERVER_IP:8080/admin/login`
+- Health: `http://SERVER_IP:8080/health`
 
-## الإعدادات
-
-`.env`:
+## إعداد `.env`
 
 ```env
-SECRET_KEY=change-this-to-a-long-random-value
-ADMIN_TOKEN=change-this-to-a-long-random-admin-token
+SECRET_KEY=replace-with-a-long-random-secret
+ADMIN_TOKEN=replace-with-a-long-random-admin-token
 PORT=8080
+COOKIE_SECURE=0
+
+PROJECT_SLUG=discovery
+PROJECT_NAME=VOYAGE
+PROJECT_NAME_AR=ڤوياج للسفر والسياحة
+PROJECT_SUBTITLE=مرحلة اكتشاف المتطلبات قبل بناء الـ PRD
 ```
 
-> مهم: لا تستخدم كلمة مرور قصيرة. وللنشر على الإنترنت ضع التطبيق خلف HTTPS عبر Caddy / Nginx / Cloudflare Tunnel.
+إذا كان التطبيق خلف HTTPS اضبط:
 
-## البيانات
+```env
+COOKIE_SECURE=1
+```
 
-الردود تحفظ في:
+## Cloudflare Tunnel
+
+اربط Hostname بالخدمة:
 
 ```text
-data/prdsystem.db
+discovery.example.com -> http://localhost:8080
 ```
 
-`data/` مستثنى من Git حتى لا تدخل بيانات العملاء إلى المستودع.
+ويظل عندك رابط عام واحد لكل العملاء.
 
-## تحديث المشروع
+## التحديث
 
 ```bash
 git pull
 docker compose up -d --build
 ```
 
-## نشر عبر Cloudflare Tunnel
+## قاعدة الفريق
 
-إذا كان عندك Cloudflare Tunnel، اربط Hostname بالخدمة:
+**Client request ≠ Requirement.**
 
-```text
-http://localhost:8080
-```
+قبل إدخال أي Feature في PRD تأكد من:
 
-مثال:
-
-```text
-discovery.example.com -> http://localhost:8080
-```
-
-## سير العمل المقترح
-
-```text
-Client Discovery Link
-        ↓
-Client submits needs + current workflow
-        ↓
-Review answers in Admin
-        ↓
-Export Markdown / JSON
-        ↓
-Analyze requirements
-        ↓
-Discovery Meeting
-        ↓
-PRD v0.1
-        ↓
-Client Review
-        ↓
-PRD v1.0 Approved
-        ↓
-Scope / Cost / Timeline
-        ↓
-Development
-```
-
-## ملاحظة أمنية
-
-لا تطلب من العميل إدخال كلمات مرور، API keys، بيانات بطاقات، أو أسرار تشغيلية داخل النموذج. المطلوب أسماء الأنظمة والمزودين وطريقة العمل فقط.
+- المشكلة التي يحلها.
+- المستخدم المستفيد.
+- النتيجة المطلوبة.
+- حدود MVP وOut of Scope.
+- التكاملات والقيود.
+- Acceptance Criteria قابلة للاختبار.

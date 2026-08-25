@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>لوحة الإدارة — {{ project.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="admin-body">
+  <main class="login-wrap">
+    <section class="login-card">
+      <div class="brand">
+        <img src="{{ url_for('static', filename='img/voyage-logo.png') }}" alt="VOYAGE" class="brand-logo">
+        <div><strong>{{ project.name_ar }}</strong><span>PRD Discovery Admin</span></div>
+      </div>
+      <h1>دخول لوحة الإدارة</h1>
+      <p>استخدم ADMIN_TOKEN الموجود في ملف <code>.env</code> على السيرفر.</p>
+      {% if error %}<div class="form-errors">{{ error }}</div>{% endif %}
+      <form method="post">
+        <div class="field">
+          <label class="field-label" for="token">رمز الإدارة</label>
+          <input id="token" name="token" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-primary" type="submit">دخول</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

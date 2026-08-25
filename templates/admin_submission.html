@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ submission.id }} — {{ project.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="admin-body">
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="brand">
+        <img src="{{ url_for('static', filename='img/voyage-logo.png') }}" alt="VOYAGE" class="brand-logo">
+        <div><strong>{{ project.name_ar }}</strong><span>{{ submission.id }}</span></div>
+      </div>
+      <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">الرجوع للردود</a>
+    </div>
+  </header>
+
+  <main class="shell admin-main">
+    <section class="admin-card">
+      <div class="admin-header">
+        <div><h1>تفاصيل Discovery</h1><p>راجع الكلام الخام للعميل قبل تحويله إلى متطلبات وPRD.</p></div>
+        <div class="admin-actions">
+          <a class="btn btn-secondary" href="{{ url_for('export_json', submission_id=submission.id) }}">تنزيل JSON</a>
+          <a class="btn btn-primary" href="{{ url_for('export_markdown', submission_id=submission.id) }}">تنزيل Markdown</a>
+        </div>
+      </div>
+
+      <div class="meta-grid">
+        <div class="meta-item"><span>المرجع</span><strong>{{ submission.id }}</strong></div>
+        <div class="meta-item"><span>المسؤول</span><strong>{{ submission.contact_name or '-' }}</strong></div>
+        <div class="meta-item"><span>البريد</span><strong>{{ submission.contact_email or '-' }}</strong></div>
+        <div class="meta-item"><span>الجوال</span><strong>{{ submission.contact_phone or '-' }}</strong></div>
+      </div>
+
+      {% for section in sections %}
+        {% set ns = namespace(has_answer=false) %}
+        {% for q in section.questions %}
+          {% if answers.get(q.id) not in [None, '', [], false] %}{% set ns.has_answer = true %}{% endif %}
+        {% endfor %}
+        {% if ns.has_answer %}
+        <section class="admin-section">
+          <h2>{{ section.title }}</h2>
+          {% for q in section.questions %}
+            {% set value = answers.get(q.id) %}
+            {% if value not in [None, '', [], false] %}
+            <div class="answer">
+              <strong>{{ q.label }}</strong>
+              <p>{{ answer_to_text(value) }}</p>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </section>
+        {% endif %}
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>

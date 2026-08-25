@@ -3,35 +3,103 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ submission.id }} — {{ project.name }}</title>
+  <title>{{ submission.id }} — Discovery Analysis</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/discovery-v3.css') }}">
 </head>
 <body class="admin-body">
   <header class="topbar">
     <div class="shell topbar-inner">
       <div class="brand">
-        <img src="{{ url_for('static', filename='img/voyage-logo.png') }}" alt="VOYAGE" class="brand-logo">
+        <img src="{{ url_for('static', filename='img/voyage-logo.png') }}" alt="{{ project.name }}" class="brand-logo">
         <div><strong>{{ project.name_ar }}</strong><span>{{ submission.id }}</span></div>
       </div>
-      <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">الرجوع للردود</a>
+      <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">الرجوع للصندوق</a>
     </div>
   </header>
 
-  <main class="shell admin-main">
+  <main class="shell admin-main discovery-detail">
     <section class="admin-card">
       <div class="admin-header">
-        <div><h1>تفاصيل Discovery</h1><p>راجع الكلام الخام للعميل قبل تحويله إلى متطلبات وPRD.</p></div>
+        <div>
+          <div class="eyebrow">Discovery Analysis</div>
+          <h1>{{ answers.get('company_name') or answers.get('contact_name') or submission.id }}</h1>
+          <p>افهم المشكلة أولاً، اقفل الفجوات، وبعدها ابدأ صياغة الـ PRD والحل.</p>
+        </div>
         <div class="admin-actions">
-          <a class="btn btn-secondary" href="{{ url_for('export_json', submission_id=submission.id) }}">تنزيل JSON</a>
-          <a class="btn btn-primary" href="{{ url_for('export_markdown', submission_id=submission.id) }}">تنزيل Markdown</a>
+          <a class="btn btn-secondary" href="{{ url_for('export_json', submission_id=submission.id) }}">JSON خام</a>
+          <a class="btn btn-primary" href="{{ url_for('export_markdown', submission_id=submission.id) }}">Discovery Brief MD</a>
         </div>
       </div>
 
-      <div class="meta-grid">
+      <div class="meta-grid meta-grid-5">
         <div class="meta-item"><span>المرجع</span><strong>{{ submission.id }}</strong></div>
         <div class="meta-item"><span>المسؤول</span><strong>{{ submission.contact_name or '-' }}</strong></div>
         <div class="meta-item"><span>البريد</span><strong>{{ submission.contact_email or '-' }}</strong></div>
-        <div class="meta-item"><span>الجوال</span><strong>{{ submission.contact_phone or '-' }}</strong></div>
+        <div class="meta-item"><span>الحالة</span><strong>{{ status_labels.get(submission.status, submission.status) }}</strong></div>
+        <div class="meta-item"><span>تاريخ الاستلام</span><strong>{{ submission.created_at[:10] }}</strong></div>
+      </div>
+
+      <section class="analysis-hero analysis-{{ analysis.tone }}">
+        <div class="score-card">
+          <div class="score-number">{{ analysis.score }}<small>%</small></div>
+          <div>
+            <strong>Discovery Readiness</strong>
+            <p>{{ analysis.label }}</p>
+          </div>
+        </div>
+        <div class="signal-grid">
+          {% for signal in analysis.signals %}
+          <div class="signal {% if signal.ready %}signal-ready{% else %}signal-open{% endif %}">
+            <span>{{ signal.label }}</span>
+            <strong>{{ signal.complete }}/{{ signal.total }}</strong>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="snapshot-grid">
+        <article class="snapshot-card">
+          <span>المشكلة الأساسية</span>
+          <p>{{ answers.get('core_problem') or 'غير موضحة' }}</p>
+        </article>
+        <article class="snapshot-card">
+          <span>النتيجة المطلوبة</span>
+          <p>{{ answers.get('desired_outcome') or 'غير موضحة' }}</p>
+        </article>
+        <article class="snapshot-card">
+          <span>العملية الحالية</span>
+          <p>{{ answers.get('current_process') or 'غير موضحة' }}</p>
+        </article>
+        <article class="snapshot-card">
+          <span>Must-have للنسخة الأولى</span>
+          <p>{{ answers.get('must_haves') or 'غير موضحة' }}</p>
+        </article>
+      </section>
+
+      <section class="gap-card">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">قبل كتابة الـ PRD</span>
+            <h2>أسئلة لازم نقفلها</h2>
+          </div>
+          <span class="gap-count">{{ analysis.missing|length }} فجوات</span>
+        </div>
+        {% if analysis.next_questions %}
+        <ol class="gap-list">
+          {% for question in analysis.next_questions %}<li>{{ question }}</li>{% endfor %}
+        </ol>
+        {% else %}
+        <div class="ready-note">ما فيه فجوات أساسية ظاهرة من النموذج. راجع الافتراضات مع العميل قبل اعتماد النطاق.</div>
+        {% endif %}
+      </section>
+
+      <div class="section-heading raw-heading">
+        <div>
+          <span class="section-kicker">Source of truth</span>
+          <h2>إجابات العميل كاملة</h2>
+        </div>
+        <span class="answered-count">{{ analysis.answered_count }}/{{ analysis.total_questions }} نقطة</span>
       </div>
 
       {% for section in sections %}
@@ -40,20 +108,27 @@
           {% if answers.get(q.id) not in [None, '', [], false] %}{% set ns.has_answer = true %}{% endif %}
         {% endfor %}
         {% if ns.has_answer %}
-        <section class="admin-section">
-          <h2>{{ section.title }}</h2>
-          {% for q in section.questions %}
-            {% set value = answers.get(q.id) %}
-            {% if value not in [None, '', [], false] %}
-            <div class="answer">
-              <strong>{{ q.label }}</strong>
-              <p>{{ answer_to_text(value) }}</p>
-            </div>
-            {% endif %}
-          {% endfor %}
-        </section>
+        <details class="admin-section discovery-section" open>
+          <summary>{{ section.title }}</summary>
+          <div class="section-answers">
+            {% for q in section.questions %}
+              {% set value = answers.get(q.id) %}
+              {% if value not in [None, '', [], false] %}
+              <div class="answer">
+                <strong>{{ q.label }}</strong>
+                <p>{{ answer_to_text(value) }}</p>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </details>
         {% endif %}
       {% endfor %}
+
+      <div class="team-rule">
+        <strong>قاعدة الفريق:</strong>
+        هذا الرد Discovery Input وليس Requirement معتمد. لا تحوّل طلب العميل مباشرة إلى Feature قبل تأكيد المشكلة، النطاق، المستخدمين والـ Acceptance Criteria.
+      </div>
     </section>
   </main>
 </body>
